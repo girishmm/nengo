@@ -44,7 +44,7 @@ class NetworkMember(type):
         return inst
 
 
-class NengoObject(SupportDefaultsMixin, metaclass=NetworkMember):
+class NengoObject(metaclass=NetworkMember):
     """A base class for Nengo objects.
 
     Parameters
@@ -111,7 +111,17 @@ class NengoObject(SupportDefaultsMixin, metaclass=NetworkMember):
                 "Did you mean to change an existing attribute?" % (name, self),
                 SyntaxWarning,
             )
-        super().__setattr__(name, val)
+        if val is Default:
+            val = Config.default(type(self), name)
+
+        if rc.getboolean("exceptions", "simplified"):
+            try:
+                super().__setattr__(name, val)
+            except ValidationError:
+                exc_info = sys.exc_info()
+                raise exc_info[1].with_traceback(None)
+        else:
+            super().__setattr__(name, val)
 
     def __str__(self):
         return self._str(include_id=not hasattr(self, "label") or self.label is None)
@@ -264,6 +274,19 @@ class FrozenObject:
             setattr(self, attr, state.pop(attr))
 
         self.__dict__.update(state)
+
+    def __setattr__(self, name, val):
+        if val is Default:
+            val = getattr(type(self), name).default
+
+        if rc.getboolean("exceptions", "simplified"):
+            try:
+                super().__setattr__(name, val)
+            except ValidationError:
+                exc_info = sys.exc_info()
+                raise exc_info[1].with_traceback(None)
+        else:
+            super().__setattr__(name, val)
 
     def __repr__(self):
         if isinstance(self._argreprs, str):

@@ -467,27 +467,3 @@ class Config:
             raise TypeError("configures() takes 1 or more arguments (0 given)")
         for klass in classes:
             self.params[klass] = ClassParams(klass)
-
-
-class SupportDefaultsMixin:
-    """Mixin to support assigning ``Default`` to parameters.
-
-    Implements ``__setattr__`` to do so. If the inheriting class overrides
-    this method, it has to call the mixin's ``__setattr__``.
-
-    This mixin may simplify the exception depending on the value of the
-    ``simplified`` rc option.
-    """
-
-    def __setattr__(self, name, val):
-        if val is Default:
-            val = Config.default(type(self), name)
-
-        if rc.getboolean("exceptions", "simplified"):
-            try:
-                super().__setattr__(name, val)
-            except ValidationError:
-                exc_info = sys.exc_info()
-                raise exc_info[1].with_traceback(None)
-        else:
-            super().__setattr__(name, val)

@@ -2,7 +2,6 @@ import pytest
 
 import nengo
 from nengo.base import NengoObject
-from nengo.config import SupportDefaultsMixin
 from nengo.exceptions import ConfigError, ReadonlyError
 from nengo.params import Default, Parameter
 from nengo.utils.testing import ThreadedAssertion
@@ -216,10 +215,11 @@ def test_contains():
 
 
 def test_subclass_config():
-    class MyParent(SupportDefaultsMixin):
+    class MyParent(NengoObject):
         p = Parameter("p", default="baba")
 
         def __init__(self, p=Default):
+            super().__init__(None, None)
             self.p = p
 
     class MyChild(MyParent):
@@ -227,12 +227,12 @@ def test_subclass_config():
 
     with nengo.Config(MyParent) as cfg:
         cfg[MyParent].p = "value1"
-        a = MyChild()
+        a = MyChild(add_to_container=False)
         assert a.p == "value1"
 
     with nengo.Config(MyParent) as cfg:
         cfg[MyChild].p = "value2"
-        a = MyChild()
+        a = MyChild(add_to_container=False)
         assert a.p == "value2"
 
     # If any config entry in the current context fits with the object being
@@ -243,5 +243,5 @@ def test_subclass_config():
 
         with nengo.Config(MyParent) as cfg2:
             cfg2[MyParent].p = "value2"
-            a = MyChild()
+            a = MyChild(add_to_container=False)
             assert a.p == "value2"
