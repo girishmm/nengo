@@ -1,7 +1,7 @@
 import pytest
 
 import nengo
-import nengo.synapses
+from nengo.base import NengoObject
 from nengo.config import SupportDefaultsMixin
 from nengo.exceptions import ConfigError, ReadonlyError
 from nengo.params import Default, Parameter
@@ -140,7 +140,7 @@ def test_configstack():
         e2 = nengo.Ensemble(6, dimensions=1)
         excite = nengo.Connection(e1, e2)
         with nengo.Config(nengo.Connection) as inhib:
-            inhib[nengo.Connection].synapse = nengo.synapses.Lowpass(0.00848)
+            inhib[nengo.Connection].synapse = nengo.Lowpass(0.00848)
             inhibit = nengo.Connection(e1, e2)
     assert excite.synapse == nengo.Connection.synapse.default
     assert excite.transform.init == -1

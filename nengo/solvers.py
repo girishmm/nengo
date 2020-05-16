@@ -10,9 +10,10 @@ import time
 
 import numpy as np
 
-import nengo.utils.least_squares_solvers as lstsq
-from nengo.params import BoolParam, FrozenObject, NdarrayParam, NumberParam, Parameter
+from nengo.base import FrozenObject
+from nengo.params import BoolParam, NdarrayParam, NumberParam, Parameter
 from nengo.utils.least_squares_solvers import (
+    Cholesky,
     format_system,
     rmses,
     LeastSquaresSolverParam,
@@ -163,7 +164,7 @@ class LstsqNoise(Solver):
     noise = NumberParam("noise", low=0)
     solver = LeastSquaresSolverParam("solver")
 
-    def __init__(self, weights=False, noise=0.1, solver=lstsq.Cholesky()):
+    def __init__(self, weights=False, noise=0.1, solver=Cholesky()):
         super().__init__(weights=weights)
         self.noise = noise
         self.solver = solver
@@ -220,7 +221,7 @@ class LstsqL2(Solver):
     reg = NumberParam("reg", low=0)
     solver = LeastSquaresSolverParam("solver")
 
-    def __init__(self, weights=False, reg=0.1, solver=lstsq.Cholesky()):
+    def __init__(self, weights=False, reg=0.1, solver=Cholesky()):
         super().__init__(weights=weights)
         self.reg = reg
         self.solver = solver

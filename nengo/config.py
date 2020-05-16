@@ -12,10 +12,9 @@ https://nbviewer.ipython.org/urls/gist.github.com/ChrisBeaumont/5758381/raw/desc
 """
 
 import inspect
-import sys
 
 from nengo.exceptions import ConfigError, ValidationError
-from nengo.params import Default, is_param, iter_params
+from nengo.params import is_param, iter_params
 from nengo.rc import rc
 from nengo.utils.threading import ThreadLocalStack
 
